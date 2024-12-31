@@ -4,7 +4,8 @@ import {deepStrictEqual} from "node:assert";
 import {includeFiles, setFileReader} from "../index.mjs";
 
 test("includeFiles() single include", async () => {
-    const html       = "<div><!-- include(file.txt); --></div>";
+    const html = "<div><!-- include(file.txt); --></div>";
+    /** @type {(filename: string) => Promise<string>} */
     const fileReader = (filename) => {
         deepStrictEqual(filename, "file.txt");
         return new Promise((resolve) => resolve("Hello, World!"));
@@ -16,8 +17,8 @@ test("includeFiles() single include", async () => {
 });
 
 test("includeFiles() multiple includes in a single elems", async () => {
-    const html       =
-              "<div><!-- include(file1.txt); --> <!-- include(file2.txt); --></div>";
+    const html = "<div><!-- include(file1.txt); --> <!-- include(file2.txt); --></div>";
+    /** @type {(filename: string) => Promise<string>} */
     const fileReader = (filename) => {
         return new Promise((resolve) => resolve(`Hello, ${filename}!`));
     };
@@ -28,8 +29,9 @@ test("includeFiles() multiple includes in a single elems", async () => {
 });
 
 test("includeFiles() multiple includes in separate elems", async () => {
-    const html       = "<div><!-- include(file3.txt); --></div>" +
-        "<div><!-- include(file4.txt); --></div>";
+    const html = "<div><!-- include(file3.txt); --></div>" +
+                 "<div><!-- include(file4.txt); --></div>";
+    /** @type {(filename: string) => Promise<string>} */
     const fileReader = (filename) => {
         return new Promise((resolve) => resolve(`Hello, ${filename}!`));
     };
@@ -41,7 +43,8 @@ test("includeFiles() multiple includes in separate elems", async () => {
 });
 
 test("includeFiles() missing file", async () => {
-    const html       = "<div><!-- include(missing.txt); --></div>";
+    const html = "<div><!-- include(missing.txt); --></div>";
+    /** @type {(filename: string) => Promise<string>} */
     const fileReader = (filename) => {
         void filename;
         return new Promise((_, reject) => reject(new Error("File not found")));
@@ -53,7 +56,8 @@ test("includeFiles() missing file", async () => {
 });
 
 test("includeFiles() error reading file", async () => {
-    const html       = "<div><!-- include(file.txt); --></div>";
+    const html = "<div><!-- include(file.txt); --></div>";
+    /** @type {(filename: string) => Promise<string>} */
     const fileReader = (filename) => {
         void filename;
         return new Promise((_, reject) => reject(new Error("Permission denied")));
@@ -79,8 +83,8 @@ test("includeFiles() empty string", async () => {
 });
 
 test("includeFiles() multiple occurrences", async () => {
-    const html       =
-              "<div><!-- include(file.txt); --></div><p><!-- include(file.txt); --></p>";
+    const html = "<div><!-- include(file.txt); --></div><p><!-- include(file.txt); --></p>";
+    /** @type {(filename: string) => Promise<string>} */
     const fileReader = (filename) => {
         return new Promise((resolve) => resolve(`Hello, ${filename}!`));
     };

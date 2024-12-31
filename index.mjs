@@ -2,6 +2,7 @@ import {join}     from "node:path";
 import {readFile} from "node:fs/promises";
 import {logError} from "@popovmp/logger";
 
+/** @type {(filename: string) => Promise<string>} */
 let fileReader = (filename) => {
     return readFile(filename, {encoding: "utf8"});
 };
@@ -18,6 +19,9 @@ let fileReader = (filename) => {
 
 /**
  * Set a custom file reader function.
+ *
+ * @param {(filename: string) => Promise<string>} reader
+ * @returns {void}
  */
 export function setFileReader(reader) {
     fileReader = reader;
@@ -115,10 +119,10 @@ export async function includeFiles(html, baseDir) {
             const filePath    = join(baseDir, filename);
             const fileContent = await fileReader(filePath);
             replacements.push({match: match[0], content: fileContent});
-        } catch (error) {
+        } catch (/** @type {any} */ error) {
             replacements.push({match: match[0], content: ""});
             logError(
-                `Error including file: ${filename}: ${(/** @type {Error} */ error).message}`,
+                `Error including file: ${filename}: ${error.message}`,
                 "html-template-engine :: include",
             );
         }
@@ -166,10 +170,10 @@ export async function includeFilesIf(html, baseDir, viewModel) {
             } else {
                 html = html.replace(match[0], "");
             }
-        } catch (error) {
+        } catch (/** @type {any} */ error) {
             html = html.replace(match[0], "");
             logError(
-                `Error including file: ${filename}: ${(/** @type {Error} */ error).message}`,
+                `Error including file: ${filename}: ${error.message}`,
                 "html-template-engine :: includeIf",
             );
         }

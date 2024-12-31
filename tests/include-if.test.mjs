@@ -6,6 +6,7 @@ import {includeFilesIf, setFileReader} from "../index.mjs";
 test("includeFilesIf() single include", async () => {
     const html       = "<div><!-- includeIf(isInclude, filename.txt); --></div>";
     const viewModel  = {isInclude: true};
+    /** @type {(filename: string) => Promise<string>} */
     const fileReader = (filename) => {
         return new Promise((resolve) => resolve(`Hello, ${filename}!`));
     };
@@ -18,6 +19,7 @@ test("includeFilesIf() single include", async () => {
 test("includeFilesIf() include false", async () => {
     const html       = "<div><!-- includeIf(isInclude, filename.txt); --></div>";
     const viewModel  = {isInclude: false};
+    /** @type {(filename: string) => Promise<string>} */
     const fileReader = (filename) => {
         void filename;
         throw new Error("File should not be included");
@@ -31,6 +33,7 @@ test("includeFilesIf() include false", async () => {
 test("includeFilesIf() missing file", async () => {
     const html       = "<div><!-- includeIf(isInclude, missing.txt); --></div>";
     const viewModel  = {isInclude: true};
+    /** @type {(filename: string) => Promise<string>} */
     const fileReader = (filename) => {
         void filename;
         return new Promise((_, reject) => reject(new Error("File not found")));
