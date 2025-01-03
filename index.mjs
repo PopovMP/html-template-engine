@@ -58,7 +58,7 @@ export async function renderTemplate(html, viewModel, baseDir) {
     html = renderIf(html, viewModel);
     html = replacePlaceholders(html, viewModel);
 
-    return minifyHtml(html);
+    return html;
 }
 
 /**
