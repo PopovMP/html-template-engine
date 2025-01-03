@@ -208,28 +208,26 @@ export async function includeFilesIf(html, baseDir, viewModel) {
  * @returns {string}
  */
 export function renderIf(html, viewModel) {
-  return html.replace(
-      /<!--\s*renderIf\(([^)]+)\);?\s*-->([\s\S]*?)<!--\s*endIf\(\);?\s*-->/g,
-      replacer,
-  );
+    const regExp = /<!--\s*renderIf\(([^)]+)\);?\s*-->([\s\S]*?)<!--\s*endIf\(\);?\s*-->/g;
+    return html.replace(regExp, replacer);
 
-  /**
-   * Replaces the content conditionally.
-   * @param {string} _
-   * @param {string} key
-   * @param {string} content
-   * @returns {string|string}
-   */
-  function replacer(_, key, content) {
-    return viewModel[key] ? content : "";
-  }
+    /**
+     * Replaces the content conditionally.
+     * @param {string} _
+     * @param {string} key
+     * @param {string} content
+     * @returns {string}
+     */
+    function replacer(_, key, content) {
+        return viewModel[key] ? content : "";
+    }
 }
 
 /**
- * Minify the HTML - remove leading spaces, empty lines, comments and trims the lines.
+ * Minify the HTML - compacts spaces, removes comments.
  *
  * ```javascript
- * const html = "   <div><span>Hello, World!</span><!-- My comment --></div>  ";
+ * const html = "   <div><span>Hello, World!</span><!-- My comment --></div>";
  * minifyHtml(html); // "<div><span>Hello, World!</span></div>";
  * ```
  * @param   {string} html
@@ -237,7 +235,6 @@ export function renderIf(html, viewModel) {
  */
 export function minifyHtml(html) {
     return html
-        .replace(/^\s+|\s+$/gm, "")       // Remove leading and trailing spaces
-        .replace(/[\r\n]+/g, "\n")        // Remove empty lines
+        .replace(/\s+/gm, " ") // Replaces multiple spaces with a single space
         .replace(/<!--[\s\S]*?-->/g, ""); // Remove comments
 }
