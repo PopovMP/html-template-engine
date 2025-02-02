@@ -52,8 +52,11 @@ export async function renderTemplate(html, viewModel, baseDir) {
     html = renderIf(html, viewModel);
     html = replacePlaceholders(html, viewModel);
 
-    html = await includeFilesIf(html, baseDir, viewModel);
-    html = await includeFiles(html, baseDir);
+    // Include files recursively
+    do {
+        html = await includeFilesIf(html, baseDir, viewModel);
+        html = await includeFiles(html, baseDir);
+    } while (html.match(/<!--\s*include\(/) || html.match(/<!--\s*includeIf\(/));
 
     html = renderIf(html, viewModel);
     html = replacePlaceholders(html, viewModel);
