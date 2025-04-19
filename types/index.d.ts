@@ -24,7 +24,7 @@ declare module "@popovmp/html-template-engine" {
      * @param   {string}                                baseDir
      * @returns {Promise<string>}
      */
-    export async function renderTemplate(
+    export function renderTemplate(
         html     : string,
         viewModel: Record<string, string|boolean|number>,
         baseDir  : string,
@@ -65,7 +65,7 @@ declare module "@popovmp/html-template-engine" {
      * @param   {string} baseDir
      * @returns {Promise<string>}
      */
-    export async function includeFiles(html: string, baseDir: string): Promise<string>;
+    export function includeFiles(html: string, baseDir: string): Promise<string>;
 
     /**
      * Include files conditionally in the HTML.
@@ -88,7 +88,7 @@ declare module "@popovmp/html-template-engine" {
      * @param   {Record<string, string|boolean|number>} viewModel
      * @returns {Promise<string>}
      */
-    export async function includeFilesIf(
+    export function includeFilesIf(
         html     : string,
         baseDir  : string,
         viewModel: Record<string, string|boolean|number>,
