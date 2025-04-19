@@ -17,6 +17,19 @@ describe("includeFilesIf()", () => {
         deepStrictEqual(actual, expected);
     });
 
+    test("single include with quotes", async () => {
+        const html       = '<div><!-- includeIf(isInclude, "world.txt"); --></div>';
+        const viewModel  = {isInclude: true};
+        /** @type {(filename: string) => Promise<string>} */
+        const fileReader = (filename) => {
+            return new Promise((resolve) => resolve(`Hello, ${filename}!`));
+        };
+        setFileReader(fileReader);
+        const actual   = await includeFilesIf(html, ".", viewModel);
+        const expected = "<div>Hello, world.txt!</div>";
+        deepStrictEqual(actual, expected);
+    });
+    
     test("include false", async () => {
         const html       = "<div><!-- includeIf(isInclude, filename.txt); --></div>";
         const viewModel  = {isInclude: false};

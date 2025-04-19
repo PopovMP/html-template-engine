@@ -17,6 +17,19 @@ describe("includeFiles()", () => {
         deepStrictEqual(actual, expected);
     });
 
+    test("single include with quotes", async () => {
+        const html = '<div><!-- include("my-file.html"); --></div>';
+        /** @type {(filename: string) => Promise<string>} */
+        const fileReader = (filename) => {
+            deepStrictEqual(filename, "my-file.html");
+            return new Promise((resolve) => resolve("Hello, my-file.html!"));
+        };
+        setFileReader(fileReader);
+        const expected = "<div>Hello, my-file.html!</div>";
+        const actual   = await includeFiles(html, ".");
+        deepStrictEqual(actual, expected);
+    });
+
     test("multiple includes in a single elems", async () => {
         const html = "<div><!-- include(file1.txt); --> <!-- include(file2.txt); --></div>";
         /** @type {(filename: string) => Promise<string>} */
