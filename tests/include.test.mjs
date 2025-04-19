@@ -18,7 +18,7 @@ describe("includeFiles()", () => {
     });
 
     test("single include with quotes", async () => {
-        const html = '<div><!-- include("my-file.html"); --></div>';
+        const html = "<div><!-- include('my-file.html'); --></div>";
         /** @type {(filename: string) => Promise<string>} */
         const fileReader = (filename) => {
             deepStrictEqual(filename, "my-file.html");
