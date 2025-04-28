@@ -97,7 +97,7 @@ describe("includeFiles()", () => {
     });
 
     test("multiple occurrences", async () => {
-        const html = "<div><!-- include(file.txt); --></div><p><!-- include(file.txt); --></p>";
+        const html = "<div><!-- include(    file.txt); --></div><p><!-- include('file.txt'     ); --></p>";
         /** @type {(filename: string) => Promise<string>} */
         const fileReader = (filename) => {
             return new Promise((resolve) => resolve(`Hello, ${filename}!`));

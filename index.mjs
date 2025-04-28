@@ -112,7 +112,7 @@ export function replacePlaceholders(html, viewModel) {
  * @returns {Promise<string>}
  */
 export async function includeFiles(html, baseDir) {
-    const includeRegEx = /<!--\s*include\(["']?([\w\-.]+)["']?\);?\s*-->/g;
+    const includeRegEx = /<!--\s*include\(\s*["']?([\w\-.]+)["']?\s*\);?\s*-->/g;
     const replacements = [];
 
     let match;
@@ -160,7 +160,7 @@ export async function includeFiles(html, baseDir) {
  * @returns {Promise<string>}
  */
 export async function includeFilesIf(html, baseDir, viewModel) {
-    const includeIfRegEx = /<!--\s*includeIf\(([^,]+),\s*["']?([\w\-.]+)["']?\);?\s*-->/g;
+    const includeIfRegEx = /<!--\s*includeIf\(([^,]+),\s*["']?([\w\-.]+)["']?\s*\);?\s*-->/g;
     let match;
     while ((match = includeIfRegEx.exec(html)) !== null) {
         const key      = match[1].trim();
