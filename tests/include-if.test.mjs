@@ -44,7 +44,7 @@ describe("includeFilesIf()", () => {
     });
 
     test("missing file", async () => {
-        const html       = "<div><!-- includeIf(isInclude, missing.txt); --></div>";
+        const html       = "<div><!-- includeIf(isInclude, 'missing.txt'); --></div>";
         const viewModel  = {isInclude: true};
         /** @type {(filename: string) => Promise<string>} */
         const fileReader = (filename) => {

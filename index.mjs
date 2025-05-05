@@ -51,15 +51,8 @@ export function setFileReader(reader) {
 export async function renderTemplate(html, viewModel, baseDir) {
     html = renderIf(html, viewModel);
     html = replacePlaceholders(html, viewModel);
-
-    // Include files recursively
-    do {
-        html = await includeFilesIf(html, baseDir, viewModel);
-        html = await includeFiles(html, baseDir);
-    } while (html.match(/<!--\s*include\(/) || html.match(/<!--\s*includeIf\(/));
-
-    html = renderIf(html, viewModel);
-    html = replacePlaceholders(html, viewModel);
+    html = await includeFiles(html, baseDir);
+    html = await includeFilesIf(html, baseDir, viewModel);
 
     return html;
 }
@@ -119,9 +112,10 @@ export async function includeFiles(html, baseDir) {
     while ((match = includeRegEx.exec(html)) !== null) {
         const filename = match[1].trim();
         try {
-            const filePath    = join(baseDir, filename);
-            const fileContent = await fileReader(filePath);
-            replacements.push({match: match[0], content: fileContent});
+            const filePath     = join(baseDir, filename);
+            const fileContent  = await fileReader(filePath);
+            const fileContent1 = await includeFiles(fileContent, baseDir);
+            replacements.push({match: match[0], content: fileContent1});
         } catch (/** @type {any} */ error) {
             replacements.push({match: match[0], content: ""});
             logError(
@@ -160,26 +154,39 @@ export async function includeFiles(html, baseDir) {
  * @returns {Promise<string>}
  */
 export async function includeFilesIf(html, baseDir, viewModel) {
-    const includeIfRegEx = /<!--\s*includeIf\(([^,]+),\s*["']?([\w\-.]+)["']?\s*\);?\s*-->/g;
-    let match;
-    while ((match = includeIfRegEx.exec(html)) !== null) {
-        const key      = match[1].trim();
-        const filename = match[2].trim();
-        try {
-            if (viewModel[key]) {
-                const filePath    = join(baseDir, filename);
-                const fileContent = await fileReader(filePath);
-                html = html.replace(match[0], fileContent);
+    if (!html.match( /<!--\s*includeIf\(/)) return html;
+
+    const includeIfRegEx = /<!--\s*includeIf\(([^,]+),\s*["']?([\w\-.]+)["']?\s*\);?\s*-->/;
+    const EOL            = html.includes("\r\n") ? "\r\n" : "\n";
+    const htmlLines      = html.split(/\r?\n/);
+
+    for (let i = 0; i < htmlLines.length; i++) {
+        const line = htmlLines[i];
+        let match;
+        if ((match = includeIfRegEx.exec(line)) !== null) {
+            const key      = match[1].trim();
+            const filename = match[2].trim();
+            try {
+                if (viewModel[key]) {
+                    const filePath     = join(baseDir, filename);
+                    const fileContent  = await fileReader(filePath);
+                    const fileContent1 = renderIf(fileContent, viewModel);
+                    const fileContent2 = replacePlaceholders(fileContent1, viewModel);
+                    const fileContent3 = await includeFiles(fileContent2, baseDir);
+                    const fileContent4 = await includeFilesIf(fileContent3, baseDir, viewModel);
+                    htmlLines[i] = line.replace(match[0], fileContent4);
+                }
+            } catch (/** @type {any} */ error) {
+                htmlLines[i] = line.replace(match[0], "");
+                logError(
+                    `Error including file: ${filename}: ${error.message}`,
+                    "html-template-engine :: includeIf",
+                );
             }
-        } catch (/** @type {any} */ error) {
-            html = html.replace(match[0], "");
-            logError(
-                `Error including file: ${filename}: ${error.message}`,
-                "html-template-engine :: includeIf",
-            );
         }
     }
-    return html;
+
+    return htmlLines.join(EOL);
 }
 
 /**
