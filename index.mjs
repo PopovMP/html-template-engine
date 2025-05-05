@@ -170,8 +170,6 @@ export async function includeFilesIf(html, baseDir, viewModel) {
                 const filePath    = join(baseDir, filename);
                 const fileContent = await fileReader(filePath);
                 html = html.replace(match[0], fileContent);
-            } else {
-                html = html.replace(match[0], "");
             }
         } catch (/** @type {any} */ error) {
             html = html.replace(match[0], "");

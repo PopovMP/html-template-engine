@@ -2,6 +2,8 @@
 
 The template engine encodes the operations within HTML comments.
 
+The purpose is to have absolutely valid HTML templates.
+
 ```html
 Replace the placeholder with the value of `viewModel.key`.
 <!-- key -->
@@ -59,6 +61,9 @@ console.log(result); // "<div>Hello, World!</div>"
 Template syntax: `<!-- includeIf(isInclude, filename.html); -->` Where
 `isInclude` is a property in the viewModel. If the property is `true`, the file
 is loaded and its content replaces the placeholder.
+
+If the property is `false`, the function does not check for the file and does not remove the comment.
+Yuo can use the `minifyHtml` function ot remove all the HTML comments later.
 
 ```javascript
 const html      = "<div><!-- includeIf(show, hello-world.html); --></div>";

@@ -39,9 +39,8 @@ describe("includeFilesIf()", () => {
             throw new Error("File should not be included");
         };
         setFileReader(fileReader);
-        const actual   = await includeFilesIf(html, ".", viewModel);
-        const expected = "<div></div>";
-        deepStrictEqual(actual, expected);
+        const actual = await includeFilesIf(html, ".", viewModel);
+        deepStrictEqual(actual, html);
     });
 
     test("missing file", async () => {
