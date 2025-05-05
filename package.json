@@ -1,6 +1,6 @@
 {
   "name": "@popovmp/html-template-engine",
-  "version": "1.4.1",
+  "version": "1.5.0",
   "description": "HTML Template Engine using valid HTML files and comments",
   "main": "index.mjs",
   "type": "module",
