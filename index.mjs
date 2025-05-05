@@ -53,7 +53,8 @@ export async function renderTemplate(html, viewModel, baseDir) {
     html = replacePlaceholders(html, viewModel);
     html = await includeFiles(html, baseDir);
     html = await includeFilesIf(html, baseDir, viewModel);
-
+    html = renderIf(html, viewModel);
+    html = replacePlaceholders(html, viewModel);
     return html;
 }
 
