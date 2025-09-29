@@ -113,10 +113,10 @@ export async function includeFiles(html, baseDir) {
   while ((match = includeRegEx.exec(html)) !== null) {
     const filename = match[1].trim();
     try {
-      const filePath     = join(baseDir, filename);
-      const fileContent  = await fileReader(filePath);
-      const fileContent1 = await includeFiles(fileContent, baseDir);
-      replacements.push({match: match[0], content: fileContent1});
+      const filePath = join(baseDir, filename);
+      let fileContent = await fileReader(filePath);
+      fileContent = await includeFiles(fileContent, baseDir);
+      replacements.push({match: match[0], content: fileContent});
     } catch (/** @type {any} */ error) {
       replacements.push({match: match[0], content: ""});
       logError(
@@ -169,13 +169,13 @@ export async function includeFilesIf(html, baseDir, viewModel) {
       const filename = match[2].trim();
       try {
         if (viewModel[key]) {
-          const filePath     = join(baseDir, filename);
-          const fileContent  = await fileReader(filePath);
-          const fileContent1 = renderIf(fileContent, viewModel);
-          const fileContent2 = replacePlaceholders(fileContent1, viewModel);
-          const fileContent3 = await includeFiles(fileContent2, baseDir);
-          const fileContent4 = await includeFilesIf(fileContent3, baseDir, viewModel);
-          htmlLines[i] = line.replace(match[0], fileContent4);
+          const filePath = join(baseDir, filename);
+          let fileContent = await fileReader(filePath);
+          fileContent = renderIf(fileContent, viewModel);
+          fileContent = replacePlaceholders(fileContent, viewModel);
+          fileContent = await includeFiles(fileContent, baseDir);
+          fileContent = await includeFilesIf(fileContent, baseDir, viewModel);
+          htmlLines[i] = line.replace(match[0], fileContent);
         }
       } catch (/** @type {any} */ error) {
         htmlLines[i] = line.replace(match[0], "");
