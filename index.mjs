@@ -4,7 +4,7 @@ import {logError} from "@popovmp/logger";
 
 /** @type {(filename: string) => Promise<string>} */
 let fileReader = (filename) => {
-    return readFile(filename, {encoding: "utf8"});
+  return readFile(filename, {encoding: "utf8"});
 };
 
 /**
@@ -24,7 +24,7 @@ let fileReader = (filename) => {
  * @returns {void}
  */
 export function setFileReader(reader) {
-    fileReader = reader;
+  fileReader = reader;
 }
 
 /**
@@ -49,13 +49,13 @@ export function setFileReader(reader) {
  * @returns {Promise<string>}
  */
 export async function renderTemplate(html, viewModel, baseDir) {
-    html = renderIf(html, viewModel);
-    html = replacePlaceholders(html, viewModel);
-    html = await includeFiles(html, baseDir);
-    html = await includeFilesIf(html, baseDir, viewModel);
-    html = renderIf(html, viewModel);
-    html = replacePlaceholders(html, viewModel);
-    return html;
+  html = renderIf(html, viewModel);
+  html = replacePlaceholders(html, viewModel);
+  html = await includeFiles(html, baseDir);
+  html = await includeFilesIf(html, baseDir, viewModel);
+  html = renderIf(html, viewModel);
+  html = replacePlaceholders(html, viewModel);
+  return html;
 }
 
 /**
@@ -77,17 +77,17 @@ export async function renderTemplate(html, viewModel, baseDir) {
  * @returns {string}
  */
 export function replacePlaceholders(html, viewModel) {
-    return html.replace(/<!--\s*(\w+)\s*-->/g, replacer);
+  return html.replace(/<!--\s*(\w+)\s*-->/g, replacer);
 
-    /**
-     * Replaces the placeholder with the value from the view model.
-     * @param {string} match
-     * @param {string} key
-     * @returns {string}
-     */
-    function replacer(match, key) {
-        return viewModel[key] ? String(viewModel[key]) : match;
-    }
+  /**
+   * Replaces the placeholder with the value from the view model.
+   * @param {string} match
+   * @param {string} key
+   * @returns {string}
+   */
+  function replacer(match, key) {
+    return viewModel[key] ? String(viewModel[key]) : match;
+  }
 }
 
 /**
@@ -106,31 +106,31 @@ export function replacePlaceholders(html, viewModel) {
  * @returns {Promise<string>}
  */
 export async function includeFiles(html, baseDir) {
-    const includeRegEx = /<!--\s*include\(\s*["']?([\w\-.]+)["']?\s*\);?\s*-->/g;
-    const replacements = [];
+  const includeRegEx = /<!--\s*include\(\s*["']?([\w\-.]+)["']?\s*\);?\s*-->/g;
+  const replacements = [];
 
-    let match;
-    while ((match = includeRegEx.exec(html)) !== null) {
-        const filename = match[1].trim();
-        try {
-            const filePath     = join(baseDir, filename);
-            const fileContent  = await fileReader(filePath);
-            const fileContent1 = await includeFiles(fileContent, baseDir);
-            replacements.push({match: match[0], content: fileContent1});
-        } catch (/** @type {any} */ error) {
-            replacements.push({match: match[0], content: ""});
-            logError(
-                `Error including file: ${filename}: ${error.message}`,
-                "html-template-engine :: include",
-            );
-        }
+  let match;
+  while ((match = includeRegEx.exec(html)) !== null) {
+    const filename = match[1].trim();
+    try {
+      const filePath     = join(baseDir, filename);
+      const fileContent  = await fileReader(filePath);
+      const fileContent1 = await includeFiles(fileContent, baseDir);
+      replacements.push({match: match[0], content: fileContent1});
+    } catch (/** @type {any} */ error) {
+      replacements.push({match: match[0], content: ""});
+      logError(
+        `Error including file: ${filename}: ${error.message}`,
+        "html-template-engine :: include",
+      );
     }
+  }
 
-    for (const rpl of replacements) {
-        html = html.replaceAll(rpl.match, rpl.content);
-    }
+  for (const rpl of replacements) {
+    html = html.replaceAll(rpl.match, rpl.content);
+  }
 
-    return html;
+  return html;
 }
 
 /**
@@ -155,39 +155,39 @@ export async function includeFiles(html, baseDir) {
  * @returns {Promise<string>}
  */
 export async function includeFilesIf(html, baseDir, viewModel) {
-    if (!html.match( /<!--\s*includeIf\(/)) return html;
+  if (!html.match( /<!--\s*includeIf\(/)) return html;
 
-    const includeIfRegEx = /<!--\s*includeIf\(([^,]+),\s*["']?([\w\-.]+)["']?\s*\);?\s*-->/;
-    const EOL            = html.includes("\r\n") ? "\r\n" : "\n";
-    const htmlLines      = html.split(/\r?\n/);
+  const includeIfRegEx = /<!--\s*includeIf\(([^,]+),\s*["']?([\w\-.]+)["']?\s*\);?\s*-->/;
+  const EOL            = html.includes("\r\n") ? "\r\n" : "\n";
+  const htmlLines      = html.split(/\r?\n/);
 
-    for (let i = 0; i < htmlLines.length; i++) {
-        const line = htmlLines[i];
-        let match;
-        if ((match = includeIfRegEx.exec(line)) !== null) {
-            const key      = match[1].trim();
-            const filename = match[2].trim();
-            try {
-                if (viewModel[key]) {
-                    const filePath     = join(baseDir, filename);
-                    const fileContent  = await fileReader(filePath);
-                    const fileContent1 = renderIf(fileContent, viewModel);
-                    const fileContent2 = replacePlaceholders(fileContent1, viewModel);
-                    const fileContent3 = await includeFiles(fileContent2, baseDir);
-                    const fileContent4 = await includeFilesIf(fileContent3, baseDir, viewModel);
-                    htmlLines[i] = line.replace(match[0], fileContent4);
-                }
-            } catch (/** @type {any} */ error) {
-                htmlLines[i] = line.replace(match[0], "");
-                logError(
-                    `Error including file: ${filename}: ${error.message}`,
-                    "html-template-engine :: includeIf",
-                );
-            }
+  for (let i = 0; i < htmlLines.length; i++) {
+    const line = htmlLines[i];
+    let match;
+    if ((match = includeIfRegEx.exec(line)) !== null) {
+      const key      = match[1].trim();
+      const filename = match[2].trim();
+      try {
+        if (viewModel[key]) {
+          const filePath     = join(baseDir, filename);
+          const fileContent  = await fileReader(filePath);
+          const fileContent1 = renderIf(fileContent, viewModel);
+          const fileContent2 = replacePlaceholders(fileContent1, viewModel);
+          const fileContent3 = await includeFiles(fileContent2, baseDir);
+          const fileContent4 = await includeFilesIf(fileContent3, baseDir, viewModel);
+          htmlLines[i] = line.replace(match[0], fileContent4);
         }
+      } catch (/** @type {any} */ error) {
+        htmlLines[i] = line.replace(match[0], "");
+        logError(
+          `Error including file: ${filename}: ${error.message}`,
+          "html-template-engine :: includeIf",
+        );
+      }
     }
+  }
 
-    return htmlLines.join(EOL);
+  return htmlLines.join(EOL);
 }
 
 /**
@@ -217,19 +217,19 @@ export async function includeFilesIf(html, baseDir, viewModel) {
  * @returns {string}
  */
 export function renderIf(html, viewModel) {
-    const regExp = /<!--\s*renderIf\(([^)]+)\);?\s*-->([\s\S]*?)<!--\s*endIf\(\);?\s*-->/g;
-    return html.replace(regExp, replacer);
+  const regExp = /<!--\s*renderIf\(([^)]+)\);?\s*-->([\s\S]*?)<!--\s*endIf\(\);?\s*-->/g;
+  return html.replace(regExp, replacer);
 
-    /**
-     * Replaces the content conditionally.
-     * @param {string} _
-     * @param {string} key
-     * @param {string} content
-     * @returns {string}
-     */
-    function replacer(_, key, content) {
-        return viewModel[key] ? content : "";
-    }
+  /**
+   * Replaces the content conditionally.
+   * @param {string} _
+   * @param {string} key
+   * @param {string} content
+   * @returns {string}
+   */
+  function replacer(_, key, content) {
+    return viewModel[key] ? content : "";
+  }
 }
 
 /**
@@ -243,7 +243,7 @@ export function renderIf(html, viewModel) {
  * @returns {string}
  */
 export function minifyHtml(html) {
-    return html
-        .replace(/\s+/gm, " ") // Replaces multiple spaces with a single space
-        .replace(/<!--[\s\S]*?-->/g, ""); // Remove comments
+  return html
+    .replace(/\s+/gm, " ") // Replaces multiple spaces with a single space
+    .replace(/<!--[\s\S]*?-->/g, ""); // Remove comments
 }
